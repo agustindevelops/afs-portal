@@ -1,22 +1,18 @@
-import { site } from "@/lib/site";
-
 /**
  * AFS-63 digital contact card.
  *
  * Client-approved fields: name, phone, and email.
  * Address, title, website, and social profiles stay off the card until the
  * client approves them.
- *
- * Phone is the published agency line. Leave it blank until that number is confirmed.
  */
 export const contactCard = {
-  fullName: site.name,
-  phone: "",
+  fullName: "Cassandra Chavez",
+  phone: "(956) 405-2891",
   email: "cc.aegisfs@gmail.com",
 } as const;
 
 export const contactCardHref = "/aegis.vcf";
-export const contactCardFilename = "Aegis-Financial-Services.vcf";
+export const contactCardFilename = "Cassandra-Chavez.vcf";
 
 function escapeVCard(value: string) {
   return value

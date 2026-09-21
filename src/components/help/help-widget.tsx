@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Headset, X } from "lucide-react";
 import { submitAgentAssistLead } from "@/app/actions/submit-agent-assist-lead";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,13 @@ import { cn } from "@/lib/utils";
 const fieldClassName =
   "mt-1.5 h-11 w-full rounded-lg border border-border-control bg-white px-3 text-sm text-brand-navy-950 outline-none transition-[border-color,box-shadow] placeholder:text-text-muted focus-visible:border-brand-blue-600 focus-visible:ring-[3px] focus-visible:ring-brand-gold-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
-type Step = "coverage" | "choice" | "agent" | "done";
+const FIRST_VISIT_KEY = "aegis-help-widget-seen";
+
+type Step = "welcome" | "coverage" | "choice" | "agent" | "done";
 
 export function HelpWidget({ cms }: { cms: CmsData }) {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<Step>("coverage");
+  const [step, setStep] = useState<Step>("welcome");
   const [coverage, setCoverage] = useState("");
   const [need, setNeed] = useState("");
   const [callTime, setCallTime] = useState("");
@@ -26,6 +28,17 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(FIRST_VISIT_KEY)) return;
+      setOpen(true);
+      setStep("welcome");
+    } catch {
+      setOpen(true);
+      setStep("welcome");
+    }
+  }, []);
+
   const enrollmentHref = useMemo(() => {
     if (!coverage) return null;
     const match = cms.enrollmentLinks.find(
@@ -33,6 +46,14 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
     );
     return match?.href || null;
   }, [cms, coverage]);
+
+  function markSeen() {
+    try {
+      window.localStorage.setItem(FIRST_VISIT_KEY, "1");
+    } catch {
+      /* ignore storage failures */
+    }
+  }
 
   function reset() {
     setStep("coverage");
@@ -48,6 +69,23 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
   }
 
   function close() {
+    markSeen();
+    setOpen(false);
+    reset();
+  }
+
+  function openPanel() {
+    setOpen(true);
+    setStep("coverage");
+  }
+
+  function exploreHelp() {
+    markSeen();
+    setStep("coverage");
+  }
+
+  function exitWelcome() {
+    markSeen();
     setOpen(false);
     reset();
   }
@@ -101,7 +139,7 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
     <div className="print:hidden fixed inset-y-0 right-0 z-30 flex items-center">
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={openPanel}
         className="flex h-28 w-11 flex-col items-center justify-center gap-2 rounded-l-xl border border-r-0 border-brand-gold-500 bg-brand-navy-950 text-white shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-brand-gold-200"
         aria-expanded={open}
         aria-controls="help-widget-panel"
@@ -138,6 +176,26 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
               <X />
             </Button>
           </div>
+
+          {step === "welcome" ? (
+            <div className="space-y-3">
+              <p className="text-sm text-text-secondary">
+                Answer two short questions and we will point you to an advisor
+                or a self-enrollment path. You can leave anytime.
+              </p>
+              <Button type="button" className="w-full" onClick={exploreHelp}>
+                Explore help
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={exitWelcome}
+              >
+                Exit
+              </Button>
+            </div>
+          ) : null}
 
           {step === "coverage" ? (
             <div className="space-y-2">
@@ -205,10 +263,6 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
 
           {step === "agent" ? (
             <div className="space-y-3">
-              <p className="text-sm text-text-secondary">
-                Tell us a little more. You can mention other coverage interests
-                beyond your original selection.
-              </p>
               <label className="grid gap-1 text-sm font-medium">
                 What do you need?
                 <select
@@ -281,6 +335,10 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
                 />
+                <span className="mt-1 text-xs font-normal text-text-secondary">
+                  You can also mention other types of coverage you may be
+                  interested in besides the one you chose.
+                </span>
               </label>
               {error ? (
                 <p className="text-sm text-error" role="alert">

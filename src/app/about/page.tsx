@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   ContentTile,
   ContentTileGrid,
@@ -14,7 +15,7 @@ import { getCmsData } from "@/lib/cms/get-cms-data";
 
 export default async function AboutPage() {
   const [cms, flow] = await Promise.all([getCmsData(), fetchIntakeFlow()]);
-  const { meaning, message, values } = cms.about;
+  const { meaning, message, ceo, promo, values } = cms.about;
 
   return (
     <main className="flex-1">
@@ -23,7 +24,7 @@ export default async function AboutPage() {
         subheadline="What the name means, and the standard of care the agency is built around."
       />
       <PageSection>
-        <PageWithPromo>
+        <PageWithPromo promo={promo}>
           <section className="space-y-5">
             <SectionHeading title={meaning.title} />
             <p className="text-sm font-semibold tracking-[0.16em] text-brand-blue-700 uppercase">
@@ -43,6 +44,57 @@ export default async function AboutPage() {
                 {paragraph}
               </p>
             ))}
+          </section>
+
+          <section className="space-y-8">
+            <SectionHeading
+              title="Leadership"
+              description="Meet the CEO behind Aegis Financial Services."
+            />
+            <div className="grid gap-8 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)] lg:items-start">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface-subtle shadow-[0_12px_32px_rgba(3,37,61,0.12)]">
+                <Image
+                  src={ceo.imageSrc}
+                  alt={ceo.imageAlt}
+                  fill
+                  sizes="(min-width: 1024px) 288px, 80vw"
+                  className="object-cover object-[center_20%]"
+                  priority
+                />
+              </div>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="text-2xl font-semibold text-brand-navy-950">
+                    {ceo.name}
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold tracking-[0.14em] text-brand-blue-700 uppercase">
+                    {ceo.title}
+                  </p>
+                  <p className="mt-3 font-accent text-xl text-brand-navy-950 italic">
+                    {ceo.tagline}
+                  </p>
+                </div>
+                {ceo.bio.map((paragraph) => (
+                  <p key={paragraph} className="text-text-secondary">
+                    {paragraph}
+                  </p>
+                ))}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-border-subtle bg-surface-card p-5">
+                    <p className="text-sm font-semibold tracking-[0.14em] text-brand-blue-700 uppercase">
+                      Vision
+                    </p>
+                    <p className="mt-2 text-text-secondary">{ceo.vision}</p>
+                  </div>
+                  <div className="rounded-2xl border border-border-subtle bg-surface-card p-5">
+                    <p className="text-sm font-semibold tracking-[0.14em] text-brand-blue-700 uppercase">
+                      Mission
+                    </p>
+                    <p className="mt-2 text-text-secondary">{ceo.mission}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
         </PageWithPromo>
       </PageSection>

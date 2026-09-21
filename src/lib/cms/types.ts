@@ -46,7 +46,24 @@ export type LegalPage = {
   title: string;
   summary: string;
   sections: { heading: string; body: string }[];
-  isClientTemplate: true;
+  /** True while copy is still a placeholder awaiting client approval. */
+  isClientTemplate?: boolean;
+};
+
+export type ResourceLink = {
+  id: string;
+  label: string;
+  href: string;
+  description?: string;
+  /** When set, reuse the matching enrollmentLinks record for the href. */
+  enrollmentLinkId?: string;
+};
+
+export type ResourceSection = {
+  id: string;
+  title: string;
+  intro: string;
+  links: ResourceLink[];
 };
 
 export type CmsData = {
@@ -83,6 +100,20 @@ export type CmsData = {
       headline: string;
       paragraphs: string[];
     };
+    ceo: {
+      name: string;
+      title: string;
+      imageSrc: string;
+      imageAlt: string;
+      tagline: string;
+      bio: string[];
+      vision: string;
+      mission: string;
+    };
+    promo: {
+      title: string;
+      body: string;
+    };
     values: ContentTile[];
   };
   medicare: {
@@ -94,6 +125,10 @@ export type CmsData = {
       branches: { title: string; items: string[] }[];
     };
     faqs: FaqItem[];
+    promo: {
+      title: string;
+      body: string;
+    };
   };
   health: {
     hero: PageHero;
@@ -103,6 +138,8 @@ export type CmsData = {
       intro: string;
       items: string[];
     };
+    marketplaceUrl: string;
+    marketplaceLabel: string;
   };
   ancillary: {
     hero: PageHero;
@@ -111,6 +148,10 @@ export type CmsData = {
       title: string;
       intro: string;
       contactFallback: string;
+    };
+    promo: {
+      title: string;
+      body: string;
     };
   };
   life: {
@@ -125,12 +166,25 @@ export type CmsData = {
     hero: PageHero;
     alternateMethods: { label: string; description: string }[];
     socialIntro: string;
+    saveContactIntro: string;
+    promo: {
+      title: string;
+      body: string;
+    };
   };
   helpWidget: {
     title: string;
     coverageTypes: CoverageOption[];
     needOptions: CoverageOption[];
     callTimeOptions: CoverageOption[];
+  };
+  resources: {
+    hero: PageHero;
+    sections: ResourceSection[];
+  };
+  funeral: {
+    hero: PageHero;
+    body: string[];
   };
   legalPages: LegalPage[];
   legalLinks: { label: string; href: string }[];

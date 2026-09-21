@@ -45,6 +45,17 @@ export default async function HealthPage() {
                 </li>
               ))}
             </ContentTileGrid>
+            <p className="mt-5 text-sm text-text-secondary">
+              Official ACA marketplace reference:{" "}
+              <a
+                href={page.marketplaceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-brand-link hover:underline"
+              >
+                {page.marketplaceLabel}
+              </a>
+            </p>
           </section>
 
           <section className="space-y-4">

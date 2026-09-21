@@ -7,6 +7,7 @@ import {
 import { PageWithPromo } from "@/components/layout/slogan-panel";
 import { SocialLinks } from "@/components/social/social-links";
 import { fetchIntakeFlow } from "@/lib/admin-api";
+import { contactCardHref } from "@/lib/contact-card";
 import { getCmsData } from "@/lib/cms/get-cms-data";
 
 export default async function ContactPage() {
@@ -21,7 +22,7 @@ export default async function ContactPage() {
         subheadline={page.hero.subheadline}
       />
       <PageSection>
-        <PageWithPromo>
+        <PageWithPromo promo={page.promo}>
           <section className="space-y-6">
             <SectionHeading title="Contact information" />
             <div className="grid gap-4 sm:grid-cols-2">
@@ -60,6 +61,19 @@ export default async function ContactPage() {
             <p className="font-accent text-2xl text-brand-navy-950 italic">
               {site.spanish}
             </p>
+          </section>
+
+          <section className="space-y-4">
+            <SectionHeading
+              title="Save my contact"
+              description={page.saveContactIntro}
+            />
+            <a
+              href={contactCardHref}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-brand-gold-500/50 bg-brand-navy-950 px-5 text-sm font-semibold text-white hover:bg-brand-navy-900"
+            >
+              Save my contact
+            </a>
           </section>
 
           <section className="space-y-4">

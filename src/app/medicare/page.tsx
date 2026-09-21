@@ -25,7 +25,7 @@ export default async function MedicarePage() {
         coverageKey="on_medicare"
       />
       <PageSection>
-        <PageWithPromo>
+        <PageWithPromo promo={page.promo}>
           <section>
             <SectionHeading
               title="Medicare coverage options"

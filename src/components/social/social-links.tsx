@@ -54,20 +54,19 @@ export function SocialLinks({
   return (
     <ul className="flex flex-wrap items-center gap-3">
       {items.map((social) => {
+        const hasHref = Boolean(social.href.trim());
         const className = isDark
-          ? social.href
-            ? "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10"
-            : "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/50"
-          : social.href
-            ? "inline-flex min-h-11 items-center gap-2 rounded-full border border-border-subtle bg-surface-card px-4 py-2 text-sm font-medium text-brand-navy-950 hover:border-brand-blue-600/40"
-            : "inline-flex min-h-11 items-center gap-2 rounded-full border border-border-subtle bg-surface-card px-4 py-2 text-sm font-medium text-text-muted";
+          ? "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm text-white transition-[color,background-color,border-color,transform,text-decoration-color] hover:-translate-y-0.5 hover:border-brand-gold-200 hover:bg-white/10 hover:text-brand-gold-200 hover:underline hover:decoration-brand-gold-200 hover:underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-brand-gold-200 focus-visible:outline-none"
+          : "inline-flex min-h-11 items-center gap-2 rounded-full border border-border-subtle bg-surface-card px-4 py-2 text-sm font-medium text-brand-link transition-[color,background-color,border-color,transform,text-decoration-color] hover:-translate-y-0.5 hover:border-brand-blue-600 hover:bg-surface-subtle hover:text-brand-blue-700 hover:underline hover:decoration-brand-blue-700 hover:underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-brand-gold-200 focus-visible:outline-none";
 
         const content = (
           <>
             <SocialIcon
               name={social.name}
               className={
-                isDark ? "size-4 text-brand-gold-200" : "size-4 text-brand-blue-700"
+                isDark
+                  ? "size-4 text-brand-gold-200"
+                  : "size-4 text-brand-link"
               }
             />
             {social.name}
@@ -76,7 +75,7 @@ export function SocialLinks({
 
         return (
           <li key={social.name}>
-            {social.href ? (
+            {hasHref ? (
               <a
                 href={social.href}
                 target="_blank"
@@ -86,7 +85,11 @@ export function SocialLinks({
                 {content}
               </a>
             ) : (
-              <span className={className} aria-disabled="true">
+              <span
+                className={`${className} cursor-not-allowed opacity-60`}
+                aria-disabled="true"
+                title={`${social.name} link pending`}
+              >
                 {content}
               </span>
             )}

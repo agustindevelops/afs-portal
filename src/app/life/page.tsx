@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ContentTile,
   ContentTileGrid,
@@ -25,7 +26,7 @@ export default async function LifePage() {
         coverageKey="life"
       />
       <PageSection>
-        <PageWithPromo>
+        <PageWithPromo promo={page.promo}>
           <section>
             <SectionHeading
               title="Life insurance and protection options"
@@ -43,10 +44,22 @@ export default async function LifePage() {
             </ContentTileGrid>
           </section>
 
-          <section className="rounded-2xl border border-brand-gold-500/30 bg-brand-navy-950 p-8 text-white">
-            <h2 className="text-2xl font-semibold">{page.promo.title}</h2>
-            <p className="mt-4 font-accent text-2xl leading-snug text-brand-gold-200 italic">
-              {page.promo.body}
+          <section className="rounded-2xl border border-border-subtle bg-surface-card p-6">
+            <SectionHeading
+              title="Funeral Plans"
+              description="Looking ahead to final-expense and funeral planning guidance."
+            />
+            <p className="mt-4 text-text-secondary">
+              Aegis is still writing fuller Funeral Plans details. For the current
+              overview, visit the{" "}
+              <Link
+                href="/funeral"
+                className="font-medium text-brand-link hover:underline"
+              >
+                Funeral Plans
+              </Link>{" "}
+              page, or use Need help? and choose “I am interested in a funeral
+              plan.”
             </p>
           </section>
         </PageWithPromo>

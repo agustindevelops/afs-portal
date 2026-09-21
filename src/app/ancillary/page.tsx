@@ -29,7 +29,7 @@ export default async function AncillaryPage() {
         subheadline={page.hero.subheadline}
       />
       <PageSection>
-        <PageWithPromo>
+        <PageWithPromo promo={page.promo}>
           <section>
             <SectionHeading
               title="Ancillary benefits we offer"
