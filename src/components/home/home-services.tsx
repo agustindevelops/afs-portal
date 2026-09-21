@@ -1,34 +1,9 @@
 "use client";
 
-import {
-  Armchair,
-  Building2,
-  ShieldPlus,
-  Eye,
-  Flower2,
-  HeartPulse,
-  IdCard,
-  Landmark,
-  Plane,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { coverageIcons } from "@/components/home/coverage-icons";
 import { useQuoteDialog } from "@/components/intake/quote-dialog";
 import { coverageKeyForService, services, siteContainer } from "@/lib/site";
 import { cn } from "@/lib/utils";
-
-const icons: Record<(typeof services)[number]["slug"], LucideIcon> = {
-  health: Users,
-  medicare: IdCard,
-  "texas-medicare": Landmark,
-  "dental-vision": Eye,
-  life: HeartPulse,
-  "final-expense": ShieldPlus,
-  "funeral-plans": Flower2,
-  travel: Plane,
-  retirement: Armchair,
-  mortgage: Building2,
-};
 
 export function HomeServices() {
   const { openQuote } = useQuoteDialog();
@@ -46,26 +21,29 @@ export function HomeServices() {
           </p>
         </div>
 
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="mt-10 grid gap-x-3 gap-y-8 sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => {
-            const Icon = icons[service.slug];
+            const Icon = coverageIcons[service.slug];
             return (
-              <li key={service.slug}>
+              <li key={service.slug} className="flex justify-center">
                 <button
                   type="button"
                   onClick={() => openQuote(coverageKeyForService(service.slug))}
-                  className="flex h-full w-full flex-col items-center gap-3 rounded-2xl border border-border-subtle bg-surface-card px-4 py-6 text-center shadow-[0_8px_24px_rgba(3,37,61,0.04)] transition-transform hover:-translate-y-0.5 hover:border-brand-blue-600/40"
+                  className="group flex w-[8.25rem] flex-col items-center outline-none focus-visible:ring-[3px] focus-visible:ring-brand-gold-200 focus-visible:ring-offset-2"
                 >
                   <span
                     className={cn(
-                      "flex size-14 items-center justify-center rounded-full text-white",
+                      "relative z-0 flex size-[6rem] items-center justify-center rounded-full text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_16px_rgba(3,37,61,0.14)] transition-transform group-hover:-translate-y-0.5",
                       service.color,
-                      "iconClass" in service ? service.iconClass : "",
                     )}
                   >
-                    <Icon className="size-6" aria-hidden="true" />
+                    {service.slug === "medicare" ? (
+                      <Icon className="h-11 w-[4.25rem] overflow-hidden rounded-sm" />
+                    ) : (
+                      <Icon className="size-14" />
+                    )}
                   </span>
-                  <span className="text-sm font-semibold text-brand-navy-950">
+                  <span className="relative z-10 -mt-3 w-full rounded-md border border-border-subtle bg-white px-1.5 py-2.5 text-center text-[0.72rem] leading-snug font-semibold text-brand-navy-950 shadow-[0_4px_12px_rgba(3,37,61,0.06)] transition-[border-color,box-shadow] group-hover:border-brand-blue-600/35 group-hover:shadow-[0_6px_16px_rgba(3,37,61,0.1)]">
                     {service.label}
                   </span>
                 </button>

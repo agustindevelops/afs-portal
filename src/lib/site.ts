@@ -18,53 +18,52 @@ export const services = [
   {
     slug: "health",
     label: "Individual & Family Health Insurance",
-    color: "bg-brand-teal-600",
+    color: "bg-linear-to-b from-[#18949c] to-brand-teal-600",
   },
   {
     slug: "medicare",
     label: "Medicare",
-    color: "bg-brand-blue-700",
+    color: "bg-linear-to-b from-brand-blue-600 to-brand-blue-700",
   },
   {
     slug: "texas-medicare",
     label: "Texas Medicare / Medicaid Integrated Plans",
-    color: "bg-brand-gold-500",
-    iconClass: "text-brand-navy-950",
+    color: "bg-linear-to-b from-brand-gold-500 to-brand-gold-active",
   },
   {
     slug: "dental-vision",
     label: "Dental & Vision",
-    color: "bg-brand-blue-600",
+    color: "bg-linear-to-b from-[#2aa8cf] to-brand-cyan-500",
   },
   {
     slug: "life",
     label: "Life Insurance",
-    color: "bg-brand-teal-600",
+    color: "bg-linear-to-b from-[#18949c] to-brand-teal-600",
   },
   {
     slug: "final-expense",
     label: "Final Expense",
-    color: "bg-brand-purple-600",
+    color: "bg-linear-to-b from-[#7a5aa8] to-brand-purple-600",
   },
   {
     slug: "funeral-plans",
     label: "Funeral Plans",
-    color: "bg-success",
+    color: "bg-linear-to-b from-[#1f8f66] to-success",
   },
   {
     slug: "travel",
     label: "Travel Insurance",
-    color: "bg-brand-blue-600",
+    color: "bg-linear-to-b from-[#1a8aa8] to-brand-blue-600",
   },
   {
     slug: "retirement",
     label: "Retirement",
-    color: "bg-brand-blue-700",
+    color: "bg-linear-to-b from-brand-navy-900 to-brand-navy-950",
   },
   {
     slug: "mortgage",
     label: "Mortgage Protection",
-    color: "bg-brand-blue-700",
+    color: "bg-linear-to-b from-brand-blue-600 to-brand-blue-700",
   },
 ] as const;
 
