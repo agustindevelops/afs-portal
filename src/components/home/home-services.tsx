@@ -1,4 +1,5 @@
-import Link from "next/link";
+"use client";
+
 import {
   Armchair,
   Building2,
@@ -12,7 +13,8 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import { quoteHref, services } from "@/lib/site";
+import { useQuoteDialog } from "@/components/intake/quote-dialog";
+import { coverageKeyForService, services, siteContainer } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const icons: Record<(typeof services)[number]["slug"], LucideIcon> = {
@@ -29,9 +31,11 @@ const icons: Record<(typeof services)[number]["slug"], LucideIcon> = {
 };
 
 export function HomeServices() {
+  const { openQuote } = useQuoteDialog();
+
   return (
     <section id="services" className="scroll-mt-24 bg-surface-page py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className={siteContainer}>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold text-brand-navy-950">
             Coverage that protects what matters
@@ -47,9 +51,10 @@ export function HomeServices() {
             const Icon = icons[service.slug];
             return (
               <li key={service.slug}>
-                <Link
-                  href={quoteHref(service.slug)}
-                  className="flex h-full flex-col items-center gap-3 rounded-2xl border border-border-subtle bg-surface-card px-4 py-6 text-center shadow-[0_8px_24px_rgba(3,37,61,0.04)] transition-transform hover:-translate-y-0.5 hover:border-brand-blue-600/40"
+                <button
+                  type="button"
+                  onClick={() => openQuote(coverageKeyForService(service.slug))}
+                  className="flex h-full w-full flex-col items-center gap-3 rounded-2xl border border-border-subtle bg-surface-card px-4 py-6 text-center shadow-[0_8px_24px_rgba(3,37,61,0.04)] transition-transform hover:-translate-y-0.5 hover:border-brand-blue-600/40"
                 >
                   <span
                     className={cn(
@@ -63,7 +68,7 @@ export function HomeServices() {
                   <span className="text-sm font-semibold text-brand-navy-950">
                     {service.label}
                   </span>
-                </Link>
+                </button>
               </li>
             );
           })}

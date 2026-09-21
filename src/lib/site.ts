@@ -10,6 +10,10 @@ export const site = {
   quoteCta: "Request a Free Quote",
 } as const;
 
+/** Shared page shell. Left padding clears the fixed Save contact rail. */
+export const siteContainer =
+  "mx-auto w-full max-w-[90rem] pl-16 pr-5 sm:pr-8 lg:pr-12";
+
 export const services = [
   {
     slug: "health",
@@ -82,6 +86,27 @@ export const states = [
   { value: "TX", label: "Texas" },
   { value: "FL", label: "Florida" },
 ] as const;
+
+const SERVICE_TO_COVERAGE: Partial<
+  Record<(typeof services)[number]["slug"], string>
+> = {
+  health: "under_65",
+  medicare: "on_medicare",
+  "texas-medicare": "on_medicare",
+  "dental-vision": "dental_vision",
+  life: "life",
+  travel: "travel",
+  "funeral-plans": "life",
+  "final-expense": "life",
+  mortgage: "life",
+  retirement: "under_65",
+};
+
+export function coverageKeyForService(
+  slug: (typeof services)[number]["slug"] | string,
+) {
+  return SERVICE_TO_COVERAGE[slug as (typeof services)[number]["slug"]];
+}
 
 export function quoteHref(interest?: string) {
   if (!interest) return "/#quote";

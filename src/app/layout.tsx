@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
+import { SaveContactTab } from "@/components/contact/save-contact-tab";
+import { QuoteDialogProvider } from "@/components/intake/quote-dialog";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { fetchIntakeFlow } from "@/lib/admin-api";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -34,7 +37,9 @@ export const metadata: Metadata = {
     "Helping you shield what matters most. Personalized insurance guidance serving Texas & Florida.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const flow = await fetchIntakeFlow("home-intake");
+
   return (
     <html
       lang="en"
@@ -42,9 +47,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <QuoteDialogProvider flow={flow}>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <SaveContactTab />
+        </QuoteDialogProvider>
       </body>
     </html>
   );

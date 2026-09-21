@@ -5,14 +5,14 @@ import {
   Languages,
   ShieldCheck,
 } from "lucide-react";
-import { benefits } from "@/lib/site";
+import { benefits, siteContainer } from "@/lib/site";
 
 const icons = [ShieldCheck, BadgeCheck, Clock3, Languages, Handshake];
 
 export function HomeWhyChoose() {
   return (
     <section className="bg-surface-subtle py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className={siteContainer}>
         <h2 className="text-center text-3xl font-semibold text-brand-navy-950">
           Why choose Aegis?
         </h2>
