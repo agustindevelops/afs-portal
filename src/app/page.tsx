@@ -1,22 +1,32 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { HomeHero } from "@/components/home/home-hero";
+import { HomeQuote } from "@/components/home/home-quote";
+import { HomeServices } from "@/components/home/home-services";
+import { HomeSocial } from "@/components/home/home-social";
+import { HomeWhyChoose } from "@/components/home/home-why-choose";
+import { services } from "@/lib/site";
 
-export default function Home() {
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const params = await searchParams;
+  const interestValue = firstParam(params.interest);
+  const interest = services.some((service) => service.slug === interestValue)
+    ? interestValue
+    : undefined;
+
   return (
-    <main className="flex min-h-full flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
-      <h1 className="text-3xl font-semibold tracking-tight">AFS Portal</h1>
-      <p className="max-w-md text-muted-foreground">
-        Client portal starter. Next.js, Tailwind CSS, and shadcn/ui are set up.
-      </p>
-      <div className="flex items-center gap-3">
-        <Button type="button">Get started</Button>
-        <Link
-          href="/"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Documentation
-        </Link>
-      </div>
+    <main className="flex-1">
+      <HomeHero />
+      <HomeServices />
+      <HomeWhyChoose />
+      <HomeSocial />
+      <HomeQuote
+        interest={interest}
+        sent={firstParam(params.sent) === "1"}
+        error={firstParam(params.error) === "1"}
+      />
     </main>
   );
 }
