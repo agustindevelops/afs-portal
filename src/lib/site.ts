@@ -76,12 +76,6 @@ export const benefits = [
   "Ongoing support year-round",
 ] as const;
 
-export const socials = [
-  { name: "Facebook", href: null },
-  { name: "Instagram", href: null },
-  { name: "TikTok", href: null },
-] as const;
-
 export const states = [
   { value: "TX", label: "Texas" },
   { value: "FL", label: "Florida" },

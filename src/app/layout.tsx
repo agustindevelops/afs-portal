@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import { SaveContactTab } from "@/components/contact/save-contact-tab";
+import { HelpWidget } from "@/components/help/help-widget";
 import { QuoteDialogProvider } from "@/components/intake/quote-dialog";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { Analytics } from "@/components/analytics/analytics";
 import { fetchIntakeFlow } from "@/lib/admin-api";
-import { site } from "@/lib/site";
+import { getCmsData } from "@/lib/cms/get-cms-data";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,14 +33,20 @@ const cormorant = Cormorant_Garamond({
   style: ["italic"],
 });
 
-export const metadata: Metadata = {
-  title: `${site.name} | Guidance and Protection`,
-  description:
-    "Helping you shield what matters most. Personalized insurance guidance serving Texas & Florida.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsData();
+  return {
+    title: `${cms.site.name} | Guidance and Protection`,
+    description:
+      "Helping you shield what matters most. Personalized insurance guidance serving Texas & Florida.",
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const flow = await fetchIntakeFlow("home-intake");
+  const [flow, cms] = await Promise.all([
+    fetchIntakeFlow("home-intake"),
+    getCmsData(),
+  ]);
 
   return (
     <html
@@ -47,11 +55,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <Analytics />
         <QuoteDialogProvider flow={flow}>
-          <SiteHeader />
+          <SiteHeader
+            navigation={cms.navigation}
+            spanish={cms.site.spanish}
+            quoteCta={cms.site.quoteCta}
+          />
           {children}
-          <SiteFooter />
+          <SiteFooter cms={cms} />
           <SaveContactTab />
+          <HelpWidget cms={cms} />
         </QuoteDialogProvider>
       </body>
     </html>
