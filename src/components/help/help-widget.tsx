@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { Headset, X } from "lucide-react";
 import { submitAgentAssistLead } from "@/app/actions/submit-agent-assist-lead";
+import { SaveContactTab } from "@/components/contact/save-contact-tab";
+import {
+  edgeTabClassName,
+  edgeTabLabelClassName,
+} from "@/components/layout/edge-tab";
 import { Button } from "@/components/ui/button";
 import type { CmsData } from "@/lib/cms/types";
 import { cn } from "@/lib/utils";
@@ -137,18 +142,19 @@ export function HelpWidget({ cms }: { cms: CmsData }) {
 
   return (
     <div className="print:hidden fixed inset-y-0 right-0 z-30 flex items-center">
-      <button
-        type="button"
-        onClick={openPanel}
-        className="flex h-28 w-11 flex-col items-center justify-center gap-2 rounded-l-xl border border-r-0 border-brand-gold-500 bg-brand-navy-950 text-white shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-brand-gold-200"
-        aria-expanded={open}
-        aria-controls="help-widget-panel"
-      >
-        <Headset className="size-4 text-brand-gold-200" aria-hidden />
-        <span className="[writing-mode:vertical-rl] text-xs font-medium tracking-wide">
-          Need help?
-        </span>
-      </button>
+      <div className="flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={openPanel}
+          className={edgeTabClassName}
+          aria-expanded={open}
+          aria-controls="help-widget-panel"
+        >
+          <Headset className="size-4 text-brand-gold-200" aria-hidden />
+          <span className={edgeTabLabelClassName}>Need help?</span>
+        </button>
+        <SaveContactTab />
+      </div>
 
       {open ? (
         <div

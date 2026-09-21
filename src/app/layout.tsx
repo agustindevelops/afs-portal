@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
-import { SaveContactTab } from "@/components/contact/save-contact-tab";
 import { HelpWidget } from "@/components/help/help-widget";
 import { QuoteDialogProvider } from "@/components/intake/quote-dialog";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -64,7 +63,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           />
           {children}
           <SiteFooter cms={cms} />
-          <SaveContactTab />
           <HelpWidget cms={cms} />
         </QuoteDialogProvider>
       </body>
