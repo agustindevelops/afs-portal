@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, ExternalLink } from "lucide-react";
 import { submitIntakeLead } from "@/app/actions/submit-intake-lead";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { analytics } from "@/lib/analytics";
 import { choiceIcon, IMG_TRAVEL_URL } from "@/lib/intake-icons";
 import {
   type IntakeAnswerPayload,
@@ -18,6 +19,29 @@ type HistoryEntry = {
 };
 
 type Phase = "questions" | "contact" | "submitted" | "redirected" | "error";
+
+function initialCoverageSkip(flow: IntakeFlowPayload, initialCoverageKey?: string) {
+  if (!initialCoverageKey) return null;
+  const start = flow.questions.find(
+    (question) => question.key === flow.startQuestionKey,
+  );
+  const edge = start?.edges.find((item) => item.choiceKey === initialCoverageKey);
+  if (!start || !edge) return null;
+
+  const goesToContact = edge.outcome === "COMPLETE" || !edge.toQuestionKey;
+  return {
+    history: [
+      {
+        questionKey: start.key,
+        answer: { questionKey: start.key, choiceKey: edge.choiceKey },
+      },
+    ] satisfies HistoryEntry[],
+    currentKey: goesToContact ? start.key : (edge.toQuestionKey ?? start.key),
+    phase: (goesToContact ? "contact" : "questions") as Phase,
+    questionKey: start.key,
+    redirected: edge.outcome === "REDIRECT",
+  };
+}
 
 type ContactFormState = {
   firstName: string;
@@ -71,28 +95,43 @@ export function IntakeWizard({
   className,
   onComplete,
   initialCoverageKey,
+  quoteAlreadyStarted = false,
   reserveCloseSpace = false,
 }: {
   flow: IntakeFlowPayload;
   className?: string;
   onComplete?: () => void;
   initialCoverageKey?: string;
+  quoteAlreadyStarted?: boolean;
   reserveCloseSpace?: boolean;
 }) {
   const questionsByKey = useMemo(() => {
     return new Map(flow.questions.map((question) => [question.key, question]));
   }, [flow.questions]);
 
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [currentKey, setCurrentKey] = useState(flow.startQuestionKey);
+  const [history, setHistory] = useState<HistoryEntry[]>(
+    () => initialCoverageSkip(flow, initialCoverageKey)?.history ?? [],
+  );
+  const [currentKey, setCurrentKey] = useState(
+    () =>
+      initialCoverageSkip(flow, initialCoverageKey)?.currentKey ??
+      flow.startQuestionKey,
+  );
   const [contactForm, setContactForm] = useState<ContactFormState>(emptyContactForm);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<Phase>("questions");
+  const [phase, setPhase] = useState<Phase>(
+    () => initialCoverageSkip(flow, initialCoverageKey)?.phase ?? "questions",
+  );
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [animKey, setAnimKey] = useState(0);
   const [pending, startTransition] = useTransition();
+  const quoteStarted = useRef(quoteAlreadyStarted);
+  const completedStep1 = useRef(false);
+  const completedStep2 = useRef(false);
+  const contactViewed = useRef(false);
+  const recordedInitialSkip = useRef(false);
 
   const current = questionsByKey.get(currentKey);
 
@@ -103,35 +142,44 @@ export function IntakeWizard({
     return coverageAnswer?.answer.choiceKey;
   }, [history]);
 
-  useEffect(() => {
-    if (!initialCoverageKey) return;
-    const start = questionsByKey.get(flow.startQuestionKey);
-    const edge = start?.edges.find(
-      (item) => item.choiceKey === initialCoverageKey,
-    );
-    if (!start || !edge) return;
+  function clearStepTracking() {
+    completedStep1.current = false;
+    completedStep2.current = false;
+    contactViewed.current = false;
+  }
 
-    const nextHistory: HistoryEntry[] = [
-      {
-        questionKey: start.key,
-        answer: { questionKey: start.key, choiceKey: edge.choiceKey },
-      },
-    ];
-    setHistory(nextHistory);
-    setContactForm(emptyContactForm());
-    setFieldError(null);
-    setSubmitError(null);
-    setRedirectUrl(null);
-    setAnimKey((value) => value + 1);
+  const trackQuestionAdvance = useCallback((questionKey: string, redirected: boolean) => {
+    if (!quoteStarted.current) {
+      analytics.quoteStart();
+      quoteStarted.current = true;
+    }
+    if (redirected) return;
 
-    if (edge.outcome === "COMPLETE" || !edge.toQuestionKey) {
-      setPhase("contact");
+    if (questionKey === "coverage" && !completedStep1.current) {
+      analytics.quoteStepComplete("step_1");
+      completedStep1.current = true;
       return;
     }
 
-    setPhase("questions");
-    setCurrentKey(edge.toQuestionKey);
-  }, [flow.startQuestionKey, initialCoverageKey, questionsByKey]);
+    if (questionKey.startsWith("concern_") && !completedStep2.current) {
+      analytics.quoteStepComplete("step_2");
+      completedStep2.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (recordedInitialSkip.current) return;
+    const skip = initialCoverageSkip(flow, initialCoverageKey);
+    if (!skip) return;
+    recordedInitialSkip.current = true;
+    trackQuestionAdvance(skip.questionKey, skip.redirected);
+  }, [flow, initialCoverageKey, trackQuestionAdvance]);
+
+  useEffect(() => {
+    if (phase !== "contact" || contactViewed.current) return;
+    contactViewed.current = true;
+    analytics.contactStepView();
+  }, [phase]);
 
   function reset() {
     setHistory([]);
@@ -143,6 +191,13 @@ export function IntakeWizard({
     setRedirectUrl(null);
     setPressedKey(null);
     setAnimKey((value) => value + 1);
+    clearStepTracking();
+  }
+
+  function restart() {
+    reset();
+    analytics.quoteStart();
+    quoteStarted.current = true;
   }
 
   function goBack() {
@@ -176,6 +231,7 @@ export function IntakeWizard({
       choiceKey: edge.choiceKey,
     };
     const nextHistory = [...history, { questionKey: current.key, answer }];
+    trackQuestionAdvance(current.key, edge.outcome === "REDIRECT");
 
     if (edge.outcome === "REDIRECT") {
       setHistory(nextHistory);
@@ -237,6 +293,7 @@ export function IntakeWizard({
         setPhase("error");
         return;
       }
+      analytics.generateLead();
       setPhase("submitted");
     });
   }
@@ -337,7 +394,7 @@ export function IntakeWizard({
               </p>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button type="button" onClick={reset}>
+              <Button type="button" onClick={restart}>
                 Start another request
               </Button>
               {onComplete ? (
@@ -393,7 +450,7 @@ export function IntakeWizard({
               <Button type="button" onClick={() => setPhase("contact")}>
                 Try again
               </Button>
-              <Button type="button" variant="outline" onClick={reset}>
+              <Button type="button" variant="outline" onClick={restart}>
                 Start over
               </Button>
             </div>

@@ -11,6 +11,7 @@ import {
 import { Dialog } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
 import { IntakeWizard } from "@/components/intake/intake-wizard";
+import { analytics } from "@/lib/analytics";
 import type { IntakeFlowPayload } from "@/lib/intake";
 
 type QuoteDialogContextValue = {
@@ -40,6 +41,7 @@ export function QuoteDialogProvider({
   const [instance, setInstance] = useState(0);
 
   const openQuote = useCallback((nextCoverageKey?: string) => {
+    analytics.quoteStart();
     setCoverageKey(nextCoverageKey);
     setInstance((value) => value + 1);
     setOpen(true);
@@ -82,6 +84,7 @@ export function QuoteDialogProvider({
                   key={instance}
                   flow={flow}
                   initialCoverageKey={coverageKey}
+                  quoteAlreadyStarted
                   onComplete={closeQuote}
                   reserveCloseSpace
                   className="border-border-subtle shadow-[0_24px_60px_rgba(3,37,61,0.35)]"
