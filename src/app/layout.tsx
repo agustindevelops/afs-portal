@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { HelpWidget } from "@/components/help/help-widget";
 import { QuoteDialogProvider } from "@/components/intake/quote-dialog";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { Analytics } from "@/components/analytics/analytics";
 import { fetchIntakeFlow } from "@/lib/admin-api";
 import { getCmsData } from "@/lib/cms/get-cms-data";
 import "./globals.css";
+
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -53,8 +55,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       id="top"
       className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${cormorant.variable} h-full antialiased`}
     >
+      {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
       <body className="flex min-h-full flex-col">
-        <Analytics />
         <QuoteDialogProvider flow={flow}>
           <SiteHeader
             navigation={cms.navigation}
