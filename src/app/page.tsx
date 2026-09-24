@@ -1,3 +1,4 @@
+import { DimeCalculator } from "@/components/home/dime-calculator";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeQuote } from "@/components/home/home-quote";
 import { HomeServices } from "@/components/home/home-services";
@@ -16,6 +17,7 @@ export default async function Home() {
     <main className="flex-1">
       <HomeHero flow={flow} />
       <HomeServices />
+      <DimeCalculator />
       <HomeWhyChoose />
       <HomeSocial socialMedia={cms.socialMedia} />
       <HomeQuote flow={flow} />
