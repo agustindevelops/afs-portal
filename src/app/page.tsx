@@ -4,10 +4,22 @@ import { HomeQuote } from "@/components/home/home-quote";
 import { HomeServices } from "@/components/home/home-services";
 import { HomeSocial } from "@/components/home/home-social";
 import { HomeWhyChoose } from "@/components/home/home-why-choose";
+import { SimpleHome } from "@/components/home/simple-home";
 import { fetchIntakeFlow } from "@/lib/admin-api";
 import { getCmsData } from "@/lib/cms/get-cms-data";
+import { contactLanding } from "@/lib/site";
 
 export default async function Home() {
+  if (contactLanding) {
+    const flow = await fetchIntakeFlow("home-intake");
+
+    return (
+      <main className="flex-1">
+        <SimpleHome flow={flow} />
+      </main>
+    );
+  }
+
   const [flow, cms] = await Promise.all([
     fetchIntakeFlow("home-intake"),
     getCmsData(),

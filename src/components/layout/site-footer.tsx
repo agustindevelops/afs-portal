@@ -4,29 +4,34 @@ import { SocialLinks } from "@/components/social/social-links";
 import { buttonVariants } from "@/components/ui/button";
 import { contactCardHref } from "@/lib/contact-card";
 import type { CmsData } from "@/lib/cms/types";
-import { siteContainer } from "@/lib/site";
+import { contactLanding, landingContainer, siteContainer } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteFooter({ cms }: { cms: CmsData }) {
   const { site, contact, socialMedia, legalLinks } = cms;
   const year = new Date().getFullYear();
+  const shell = contactLanding ? landingContainer : siteContainer;
 
   return (
     <footer className="dark mt-auto bg-brand-navy-950 text-white">
       <div
         className={cn(
-          siteContainer,
-          "grid gap-10 py-12 lg:grid-cols-[1.2fr_1fr_1fr]",
+          shell,
+          contactLanding
+            ? "grid gap-10 py-12 sm:grid-cols-2"
+            : "grid gap-10 py-12 lg:grid-cols-[1.2fr_1fr_1fr]",
         )}
       >
-        <div className="space-y-3">
-          <AegisLogo />
-          <p className="max-w-sm text-sm text-brand-gold-200/90">{site.tagline}</p>
-          <p className="text-sm text-[#D6E4EA]">{site.serving}</p>
-          <p className="font-accent text-lg text-brand-gold-200 italic">
-            {site.spanish}
-          </p>
-        </div>
+        {contactLanding ? null : (
+          <div className="space-y-3">
+            <AegisLogo />
+            <p className="max-w-sm text-sm text-brand-gold-200/90">{site.tagline}</p>
+            <p className="text-sm text-[#D6E4EA]">{site.serving}</p>
+            <p className="font-accent text-lg text-brand-gold-200 italic">
+              {site.spanish}
+            </p>
+          </div>
+        )}
 
         <div className="space-y-4 text-sm text-[#D6E4EA]">
           <p className="font-semibold text-white">Contact</p>
@@ -48,15 +53,17 @@ export function SiteFooter({ cms }: { cms: CmsData }) {
               {contact.email}
             </a>
           </p>
-          <div>
-            <a
-              href={contactCardHref}
-              className={buttonVariants({ variant: "outline", size: "default" })}
-            >
-              Save contact
-            </a>
-          </div>
-          <SocialLinks items={socialMedia} tone="dark" />
+          {contactLanding ? null : (
+            <div>
+              <a
+                href={contactCardHref}
+                className={buttonVariants({ variant: "outline", size: "default" })}
+              >
+                Save contact
+              </a>
+            </div>
+          )}
+          {contactLanding ? null : <SocialLinks items={socialMedia} tone="dark" />}
         </div>
 
         <div className="space-y-3 text-sm text-[#D6E4EA]">
@@ -76,7 +83,7 @@ export function SiteFooter({ cms }: { cms: CmsData }) {
         </div>
       </div>
 
-      <div className={cn(siteContainer, "border-t border-white/10 py-6")}>
+      <div className={cn(shell, "border-t border-white/10 py-6")}>
         <p className="text-sm text-[#D6E4EA]">
           © {year} {site.name}. {site.copyright}
         </p>

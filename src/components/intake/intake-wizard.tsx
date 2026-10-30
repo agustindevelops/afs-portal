@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, ExternalLink } from "lucide-react";
-import { submitIntakeLead } from "@/app/actions/submit-intake-lead";
+import {
+  submitContactLead,
+  submitIntakeLead,
+} from "@/app/actions/submit-intake-lead";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { analytics } from "@/lib/analytics";
 import { choiceIcon, IMG_TRAVEL_URL } from "@/lib/intake-icons";
@@ -97,31 +100,41 @@ export function IntakeWizard({
   initialCoverageKey,
   quoteAlreadyStarted = false,
   reserveCloseSpace = false,
+  contactOnly = false,
 }: {
-  flow: IntakeFlowPayload;
+  flow: IntakeFlowPayload | null;
   className?: string;
   onComplete?: () => void;
   initialCoverageKey?: string;
   quoteAlreadyStarted?: boolean;
   reserveCloseSpace?: boolean;
+  contactOnly?: boolean;
 }) {
   const questionsByKey = useMemo(() => {
-    return new Map(flow.questions.map((question) => [question.key, question]));
-  }, [flow.questions]);
+    return new Map(
+      (flow?.questions ?? []).map((question) => [question.key, question]),
+    );
+  }, [flow]);
 
-  const [history, setHistory] = useState<HistoryEntry[]>(
-    () => initialCoverageSkip(flow, initialCoverageKey)?.history ?? [],
+  const [history, setHistory] = useState<HistoryEntry[]>(() =>
+    !contactOnly && flow
+      ? (initialCoverageSkip(flow, initialCoverageKey)?.history ?? [])
+      : [],
   );
-  const [currentKey, setCurrentKey] = useState(
-    () =>
+  const [currentKey, setCurrentKey] = useState(() => {
+    if (contactOnly || !flow) return flow?.startQuestionKey ?? "";
+    return (
       initialCoverageSkip(flow, initialCoverageKey)?.currentKey ??
-      flow.startQuestionKey,
-  );
+      flow.startQuestionKey
+    );
+  });
   const [contactForm, setContactForm] = useState<ContactFormState>(emptyContactForm);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<Phase>(
-    () => initialCoverageSkip(flow, initialCoverageKey)?.phase ?? "questions",
-  );
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (contactOnly) return "contact";
+    if (!flow) return "questions";
+    return initialCoverageSkip(flow, initialCoverageKey)?.phase ?? "questions";
+  });
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
@@ -168,12 +181,12 @@ export function IntakeWizard({
   }, []);
 
   useEffect(() => {
-    if (recordedInitialSkip.current) return;
+    if (contactOnly || !flow || recordedInitialSkip.current) return;
     const skip = initialCoverageSkip(flow, initialCoverageKey);
     if (!skip) return;
     recordedInitialSkip.current = true;
     trackQuestionAdvance(skip.questionKey, skip.redirected);
-  }, [flow, initialCoverageKey, trackQuestionAdvance]);
+  }, [contactOnly, flow, initialCoverageKey, trackQuestionAdvance]);
 
   useEffect(() => {
     if (phase !== "contact" || contactViewed.current) return;
@@ -183,10 +196,10 @@ export function IntakeWizard({
 
   function reset() {
     setHistory([]);
-    setCurrentKey(flow.startQuestionKey);
+    setCurrentKey(flow?.startQuestionKey ?? "");
     setContactForm(emptyContactForm());
     setFieldError(null);
-    setPhase("questions");
+    setPhase(contactOnly ? "contact" : "questions");
     setSubmitError(null);
     setRedirectUrl(null);
     setPressedKey(null);
@@ -196,6 +209,7 @@ export function IntakeWizard({
 
   function restart() {
     reset();
+    if (contactOnly) return;
     analytics.quoteStart();
     quoteStarted.current = true;
   }
@@ -277,17 +291,22 @@ export function IntakeWizard({
     }
 
     startTransition(async () => {
-      const result = await submitIntakeLead({
-        flowSlug: flow.flow.slug,
-        answers: history.map((entry) => entry.answer),
-        contact: {
-          firstName: contactForm.firstName.trim(),
-          lastName: contactForm.lastName.trim(),
-          email: contactForm.email.trim().toLowerCase(),
-          phone: contactForm.phone.trim(),
-          preferredCallTime: contactForm.callTime,
-        },
-      });
+      const contact = {
+        firstName: contactForm.firstName.trim(),
+        lastName: contactForm.lastName.trim(),
+        email: contactForm.email.trim().toLowerCase(),
+        phone: contactForm.phone.trim(),
+        preferredCallTime: contactForm.callTime,
+      };
+      const result = contactOnly
+        ? await submitContactLead(contact)
+        : flow
+          ? await submitIntakeLead({
+              flowSlug: flow.flow.slug,
+              answers: history.map((entry) => entry.answer),
+              contact,
+            })
+          : { ok: false as const, error: "This form could not be loaded." };
       if (!result.ok) {
         setSubmitError(result.error);
         setPhase("error");
@@ -319,7 +338,8 @@ export function IntakeWizard({
   return (
     <div
       className={cn(
-        "flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white text-brand-navy-950 shadow-[0_24px_60px_rgba(3,37,61,0.28)]",
+        "flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white text-brand-navy-950 shadow-[0_24px_60px_rgba(3,37,61,0.28)]",
+        !contactOnly && "min-h-[28rem]",
         className,
       )}
     >
@@ -336,11 +356,14 @@ export function IntakeWizard({
           )}
         >
           <p className="text-xs font-semibold tracking-[0.18em] text-brand-gold-700 uppercase">
-            {phase === "questions" || phase === "contact"
-              ? progressLabel
-              : "Coverage guide"}
+            {contactOnly
+              ? "Contact"
+              : phase === "questions" || phase === "contact"
+                ? progressLabel
+                : "Coverage guide"}
           </p>
-          {(phase === "questions" || phase === "contact") &&
+          {!contactOnly &&
+          (phase === "questions" || phase === "contact") &&
           history.length > 0 ? (
             <button
               type="button"
@@ -353,7 +376,8 @@ export function IntakeWizard({
             </button>
           ) : null}
         </div>
-        {(phase === "questions" || phase === "contact") &&
+        {!contactOnly &&
+        (phase === "questions" || phase === "contact") &&
         showSelectionProgress ? (
           <div className="mt-3 flex gap-1.5" aria-hidden="true">
             {[1, 2, 3].map((step) => {
@@ -385,7 +409,7 @@ export function IntakeWizard({
             <CheckCircle2 className="size-10 text-success" aria-hidden="true" />
             <div className="space-y-2">
               <p className="text-sm font-medium tracking-[0.18em] text-brand-gold-700 uppercase">
-                Request received
+                {contactOnly ? "Message received" : "Request received"}
               </p>
               <h3 className="text-2xl font-semibold">Thank you</h3>
               <p className="text-text-secondary">
@@ -395,7 +419,7 @@ export function IntakeWizard({
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               <Button type="button" onClick={restart}>
-                Start another request
+                {contactOnly ? "Send another message" : "Start another request"}
               </Button>
               {onComplete ? (
                 <Button type="button" variant="outline" onClick={onComplete}>
@@ -473,7 +497,7 @@ export function IntakeWizard({
               <label className="block text-sm font-medium">
                 First name
                 <input
-                  autoFocus
+                  autoFocus={!contactOnly}
                   name="firstName"
                   autoComplete="given-name"
                   value={contactForm.firstName}
@@ -608,7 +632,11 @@ export function IntakeWizard({
                 onClick={onSubmitContact}
                 className="w-full transition-transform active:scale-[0.99]"
               >
-                {pending ? "Sending…" : "Submit request"}
+                {pending
+                  ? "Sending…"
+                  : contactOnly
+                    ? "Send my information"
+                    : "Submit request"}
                 {!pending ? (
                   <ArrowRight className="size-4" aria-hidden="true" />
                 ) : null}

@@ -3,7 +3,7 @@ import { QuoteTrigger } from "@/components/intake/quote-trigger";
 import { IntakeWizard } from "@/components/intake/intake-wizard";
 import { buttonVariants } from "@/components/ui/button";
 import type { IntakeFlowPayload } from "@/lib/intake";
-import { site, siteContainer } from "@/lib/site";
+import { contactLanding, site, siteContainer } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function HomeHero({ flow }: { flow: IntakeFlowPayload | null }) {
@@ -28,22 +28,35 @@ export function HomeHero({ flow }: { flow: IntakeFlowPayload | null }) {
           <p className="max-w-md text-lg text-[#F5F9F9]">{site.tagline}</p>
           <p className="text-sm font-medium text-[#D6E4EA]">{site.serving}</p>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-            <QuoteTrigger className="max-sm:w-full">{site.quoteCta}</QuoteTrigger>
-            <a
-              href="#services"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "max-sm:w-full",
-              )}
-            >
-              View coverage options
-            </a>
+            {contactLanding ? (
+              <a
+                href="#contact"
+                className={cn(buttonVariants({ size: "lg" }), "max-sm:w-full")}
+              >
+                Share your contact info
+              </a>
+            ) : (
+              <>
+                <QuoteTrigger className="max-sm:w-full">
+                  {site.quoteCta}
+                </QuoteTrigger>
+                <a
+                  href="#services"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "max-sm:w-full",
+                  )}
+                >
+                  View coverage options
+                </a>
+              </>
+            )}
           </div>
         </div>
 
-        <div className="relative">
-          {flow ? (
-            <IntakeWizard flow={flow} />
+        <div id="contact" className="relative scroll-mt-24">
+          {contactLanding || flow ? (
+            <IntakeWizard flow={flow} contactOnly={contactLanding} />
           ) : (
             <div className="relative hidden min-h-[28rem] overflow-hidden rounded-2xl border border-white/10 shadow-[0_24px_60px_rgba(3,37,61,0.35)] lg:block">
               <Image

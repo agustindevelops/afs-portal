@@ -6,9 +6,10 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AegisLogo } from "@/components/brand/aegis-logo";
 import { QuoteTrigger } from "@/components/intake/quote-trigger";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { contactCardHref } from "@/lib/contact-card";
 import type { NavItem } from "@/lib/cms/types";
-import { siteContainer } from "@/lib/site";
+import { contactLanding, landingContainer, siteContainer } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader({
@@ -23,6 +24,27 @@ export function SiteHeader({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const links = navigation.filter((item) => item.enabled);
+
+  if (contactLanding) {
+    return (
+      <header className="dark sticky top-0 z-40 border-b border-white/10 bg-brand-navy-950">
+        <div
+          className={cn(
+            landingContainer,
+            "flex min-h-16 items-center justify-between gap-3 py-3",
+          )}
+        >
+          <AegisLogo compact className="min-w-0" />
+          <a
+            href={contactCardHref}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Save contact
+          </a>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="dark sticky top-0 z-40 border-b border-white/10 bg-brand-navy-950">

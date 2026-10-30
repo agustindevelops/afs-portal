@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { fetchIntakeFlow } from "@/lib/admin-api";
 import { getCmsData } from "@/lib/cms/get-cms-data";
+import { contactLanding } from "@/lib/site";
 import "./globals.css";
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
@@ -65,7 +66,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           />
           {children}
           <SiteFooter cms={cms} />
-          <HelpWidget cms={cms} />
+          {contactLanding ? null : <HelpWidget cms={cms} />}
         </QuoteDialogProvider>
       </body>
     </html>
