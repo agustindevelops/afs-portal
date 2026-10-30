@@ -90,9 +90,35 @@ function readDefaults(): ColorMap {
   const styles = getComputedStyle(document.documentElement);
   const base: ColorMap = {};
   for (const token of allTokens) {
-    base[token] = styles.getPropertyValue(cssVar(token)).trim().toLowerCase();
+    base[token] = expandHex(
+      styles.getPropertyValue(cssVar(token)).trim().toLowerCase(),
+    );
   }
   return base;
+}
+
+/** Fallback for browsers or embedded views that deny the async clipboard API. */
+function copyWithTextarea(text: string) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    return document.execCommand("copy");
+  } catch {
+    return false;
+  } finally {
+    textarea.remove();
+  }
+}
+
+/** The CSS build shortens hex values (#ffffff becomes #fff). */
+function expandHex(value: string) {
+  const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(value);
+  return short ? `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}` : value;
 }
 
 function readSaved(): ColorMap {
@@ -110,7 +136,8 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
   const [defaults] = useState(readDefaults);
   const [overrides, setOverrides] = useState(readSaved);
   const [drafts, setDrafts] = useState<ColorMap>({});
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"copied" | "failed" | null>(null);
+  const [manualCopy, setManualCopy] = useState<string | null>(null);
 
   useEffect(() => {
     applyPalette(overrides);
@@ -156,11 +183,17 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
   }
 
   async function copyPalette() {
-    await navigator.clipboard.writeText(
-      paletteCss({ ...defaults, ...overrides }),
-    );
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+    const text = paletteCss({ ...defaults, ...overrides });
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch {
+      ok = copyWithTextarea(text);
+    }
+    setCopied(ok ? "copied" : "failed");
+    setManualCopy(ok ? null : text);
+    if (ok) window.setTimeout(() => setCopied(null), 2000);
   }
 
   const changedCount = Object.keys(overrides).length;
@@ -289,14 +322,42 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
                   Reset all
                 </Button>
                 <Button type="button" className="flex-1" onClick={copyPalette}>
-                  {copied ? (
+                  {copied === "copied" ? (
                     <Check aria-hidden />
                   ) : (
                     <Copy aria-hidden />
                   )}
-                  {copied ? "Copied" : "Copy colors"}
+                  {copied === "copied" ? "Copied" : "Copy colors"}
                 </Button>
               </div>
+              {manualCopy ? (
+                <div className="space-y-2 border-t border-border-subtle p-4">
+                  <p className="text-xs text-text-secondary" role="status">
+                    This browser blocked the clipboard. The colors are selected
+                    below; press Cmd/Ctrl + C to copy them.
+                  </p>
+                  <textarea
+                    readOnly
+                    autoFocus
+                    wrap="off"
+                    aria-label="Palette CSS"
+                    value={manualCopy}
+                    onFocus={(event) => event.currentTarget.select()}
+                    className="h-28 w-full resize-none rounded-md border border-border-control bg-surface-subtle p-2 font-mono text-[0.7rem] outline-none focus-visible:ring-[3px] focus-visible:ring-brand-gold-200"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setManualCopy(null);
+                      setCopied(null);
+                    }}
+                  >
+                    Done
+                  </Button>
+                </div>
+              ) : null}
             </div>,
             document.body,
           )
