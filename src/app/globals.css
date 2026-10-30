@@ -58,10 +58,10 @@
   --color-role-cta-pressed: #b6802e;
   --color-role-primary: #03253d;
   --color-role-primary-soft: #053754;
-  --color-role-accent: #07557d;
+  --color-role-secondary: #07557d;
   --color-role-link: #0b6f8e;
-  --color-role-highlight: #eece8a;
-  --color-role-highlight-strong: #8a5a00;
+  --color-role-accent: #eece8a;
+  --color-role-accent-strong: #8a5a00;
   --color-role-background: #f5f9f9;
   --color-role-background-accent: #eaf2f5;
   --color-role-surface: #ffffff;
@@ -76,14 +76,14 @@
   /* Scale names used by components; each one follows a role above. */
   --color-brand-navy-950: var(--color-role-primary);
   --color-brand-navy-900: var(--color-role-primary-soft);
-  --color-brand-blue-700: var(--color-role-accent);
+  --color-brand-blue-700: var(--color-role-secondary);
   --color-brand-blue-600: var(--color-role-link);
   --color-brand-link: var(--color-role-link);
-  --color-brand-gold-200: var(--color-role-highlight);
+  --color-brand-gold-200: var(--color-role-accent);
   --color-brand-gold-500: var(--color-role-cta);
   --color-brand-gold-600: var(--color-role-cta-hover);
   --color-brand-gold-active: var(--color-role-cta-pressed);
-  --color-brand-gold-700: var(--color-role-highlight-strong);
+  --color-brand-gold-700: var(--color-role-accent-strong);
   --color-brand-cyan-500: #1990b8;
   --color-brand-teal-600: #0b7c83;
   --color-brand-purple-600: #5b3f86;
@@ -196,6 +196,6 @@
     135deg,
     var(--color-role-primary) 0%,
     var(--color-role-primary-soft) 55%,
-    var(--color-role-accent) 100%
+    var(--color-role-secondary) 100%
   );
 }

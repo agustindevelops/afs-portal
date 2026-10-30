@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 /** Temporary: shows the brand color lab while the palette is being finalized. */
 export const brandColorLab: boolean = true;
 
-const STORAGE_KEY = "aegis-brand-palette";
+const STORAGE_KEY = "aegis-brand-palette-v2";
 const HEX = /^#[0-9a-f]{6}$/i;
 
 const groups = [
@@ -27,9 +27,9 @@ const groups = [
     tokens: [
       ["role-primary", "Primary", "Header, footer, dark sections"],
       ["role-primary-soft", "Primary soft", "Middle of dark gradients"],
-      ["role-accent", "Accent", "Gradient end, icons, focus"],
-      ["role-highlight", "Highlighter", "Eyebrows and accents on dark"],
-      ["role-highlight-strong", "Highlighter (on light)", "Eyebrows on light backgrounds"],
+      ["role-secondary", "Secondary", "Gradient end, icons, focus"],
+      ["role-accent", "Accent", "Eyebrows and accents on dark"],
+      ["role-accent-strong", "Accent (on light)", "Eyebrows on light backgrounds"],
     ],
   },
   {
