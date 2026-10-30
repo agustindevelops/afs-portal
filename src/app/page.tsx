@@ -10,20 +10,18 @@ import { getCmsData } from "@/lib/cms/get-cms-data";
 import { contactLanding } from "@/lib/site";
 
 export default async function Home() {
-  if (contactLanding) {
-    const flow = await fetchIntakeFlow("home-intake");
-
-    return (
-      <main className="flex-1">
-        <SimpleHome flow={flow} />
-      </main>
-    );
-  }
-
   const [flow, cms] = await Promise.all([
     fetchIntakeFlow("home-intake"),
     getCmsData(),
   ]);
+
+  if (contactLanding) {
+    return (
+      <main className="flex-1">
+        <SimpleHome flow={flow} cms={cms} />
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1">

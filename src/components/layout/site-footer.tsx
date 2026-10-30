@@ -26,14 +26,14 @@ export function SiteFooter({ cms }: { cms: CmsData }) {
           <div className="space-y-3">
             <AegisLogo />
             <p className="max-w-sm text-sm text-brand-gold-200/90">{site.tagline}</p>
-            <p className="text-sm text-[#D6E4EA]">{site.serving}</p>
+            <p className="text-sm text-text-inverse-muted">{site.serving}</p>
             <p className="font-accent text-lg text-brand-gold-200 italic">
               {site.spanish}
             </p>
           </div>
         )}
 
-        <div className="space-y-4 text-sm text-[#D6E4EA]">
+        <div className="space-y-4 text-sm text-text-inverse-muted">
           <p className="font-semibold text-white">Contact</p>
           {contact.phone ? (
             <p>
@@ -66,7 +66,7 @@ export function SiteFooter({ cms }: { cms: CmsData }) {
           {contactLanding ? null : <SocialLinks items={socialMedia} tone="dark" />}
         </div>
 
-        <div className="space-y-3 text-sm text-[#D6E4EA]">
+        <div className="space-y-3 text-sm text-text-inverse-muted">
           <p className="font-semibold text-white">Legal</p>
           <ul className="space-y-2">
             {legalLinks.map((link) => (
@@ -84,10 +84,10 @@ export function SiteFooter({ cms }: { cms: CmsData }) {
       </div>
 
       <div className={cn(shell, "border-t border-white/10 py-6")}>
-        <p className="text-sm text-[#D6E4EA]">
+        <p className="text-sm text-text-inverse-muted">
           © {year} {site.name}. {site.copyright}
         </p>
-        <p className="mt-2 max-w-3xl text-xs text-[#D6E4EA]/80">
+        <p className="mt-2 max-w-3xl text-xs text-text-inverse-muted/80">
           {site.disclaimer}
         </p>
       </div>

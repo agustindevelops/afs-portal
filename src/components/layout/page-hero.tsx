@@ -21,7 +21,7 @@ export function PageHero({
         <h1 className="max-w-3xl text-4xl font-semibold text-white sm:text-5xl">
           {headline}
         </h1>
-        <p className="mt-5 max-w-2xl text-lg text-[#F5F9F9]">{subheadline}</p>
+        <p className="mt-5 max-w-2xl text-lg text-text-inverse-soft">{subheadline}</p>
         {ctaLabel ? (
           <div className="mt-8">
             <QuoteTrigger coverageKey={coverageKey}>{ctaLabel}</QuoteTrigger>

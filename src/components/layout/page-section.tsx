@@ -54,7 +54,7 @@ export function SectionHeading({
         {title}
       </h2>
       {description ? (
-        <p className={cn(light ? "text-[#D6E4EA]" : "text-text-secondary")}>
+        <p className={cn(light ? "text-text-inverse-muted" : "text-text-secondary")}>
           {description}
         </p>
       ) : null}

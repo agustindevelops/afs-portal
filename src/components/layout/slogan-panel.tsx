@@ -23,7 +23,7 @@ export function PromoPanel({
       <p className="font-accent text-2xl leading-snug text-brand-gold-200 italic">
         {title}
       </p>
-      <p className="mt-3 text-sm leading-relaxed text-[#D6E4EA]">{body}</p>
+      <p className="mt-3 text-sm leading-relaxed text-text-inverse-muted">{body}</p>
     </aside>
   );
 }

@@ -19,11 +19,11 @@ export function HomeQuote({ flow }: { flow: IntakeFlowPayload | null }) {
               Free Quote
             </span>
           </h2>
-          <p className="max-w-md text-[#F5F9F9]">
+          <p className="max-w-md text-text-inverse-soft">
             Answer a few questions about the coverage you need. There is no cost
             and no obligation — we reply within 1-2 business days.
           </p>
-          <p className="text-sm text-[#D6E4EA]">
+          <p className="text-sm text-text-inverse-muted">
             {site.serving}. {site.spanish}.
           </p>
         </div>

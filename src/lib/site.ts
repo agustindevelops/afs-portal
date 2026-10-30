@@ -16,7 +16,7 @@ export const contactLanding: boolean = true;
 export const infoPacketHref = "/downloads/aegis-info-packet.pdf";
 
 /** Narrow shell for the single-page landing. */
-export const landingContainer = "mx-auto w-full max-w-3xl px-5 sm:px-8";
+export const landingContainer = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 /** Shared page shell. Left padding clears the fixed Save contact rail. */
 export const siteContainer =

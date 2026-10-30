@@ -25,8 +25,8 @@ export function HomeHero({ flow }: { flow: IntakeFlowPayload | null }) {
               {site.headlineAccent}
             </span>
           </h1>
-          <p className="max-w-md text-lg text-[#F5F9F9]">{site.tagline}</p>
-          <p className="text-sm font-medium text-[#D6E4EA]">{site.serving}</p>
+          <p className="max-w-md text-lg text-text-inverse-soft">{site.tagline}</p>
+          <p className="text-sm font-medium text-text-inverse-muted">{site.serving}</p>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
             {contactLanding ? (
               <a

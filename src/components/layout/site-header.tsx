@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AegisLogo } from "@/components/brand/aegis-logo";
+import {
+  BrandColorLabTrigger,
+  brandColorLab,
+} from "@/components/brand/brand-color-lab";
 import { QuoteTrigger } from "@/components/intake/quote-trigger";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { contactCardHref } from "@/lib/contact-card";
@@ -35,12 +39,15 @@ export function SiteHeader({
           )}
         >
           <AegisLogo compact className="min-w-0" />
-          <a
-            href={contactCardHref}
-            className={buttonVariants({ variant: "outline" })}
-          >
-            Save contact
-          </a>
+          <div className="flex items-center gap-2">
+            {brandColorLab ? <BrandColorLabTrigger /> : null}
+            <a
+              href={contactCardHref}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Save contact
+            </a>
+          </div>
         </div>
       </header>
     );
@@ -71,7 +78,7 @@ export function SiteHeader({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-lg px-2.5 py-2 text-sm text-[#D6E4EA] transition-colors hover:text-white",
+                  "rounded-lg px-2.5 py-2 text-sm text-text-inverse-muted transition-colors hover:text-white",
                   active &&
                     "text-brand-gold-200 underline decoration-brand-gold-500 decoration-2 underline-offset-8",
                 )}
@@ -118,7 +125,7 @@ export function SiteHeader({
                   href={item.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "block rounded-lg px-3 py-3 text-sm text-[#D6E4EA] hover:text-white",
+                    "block rounded-lg px-3 py-3 text-sm text-text-inverse-muted hover:text-white",
                     (item.href === "/"
                       ? pathname === "/"
                       : pathname.startsWith(item.href)) &&
