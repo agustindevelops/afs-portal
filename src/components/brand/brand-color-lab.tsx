@@ -2,49 +2,54 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Palette, RotateCcw, X } from "lucide-react";
+import { Check, Copy, Palette, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /** Temporary: shows the brand color lab while the palette is being finalized. */
 export const brandColorLab: boolean = true;
 
-const STORAGE_KEY = "aegis-brand-color-lab";
+const STORAGE_KEY = "aegis-brand-palette";
 const HEX = /^#[0-9a-f]{6}$/i;
 
 const groups = [
   {
-    title: "Brand",
+    title: "Action",
     tokens: [
-      ["brand-navy-950", "Navy (deep)"],
-      ["brand-navy-900", "Navy"],
-      ["brand-blue-700", "Blue"],
-      ["brand-blue-600", "Blue (light)"],
-      ["brand-link", "Link"],
-      ["brand-gold-200", "Gold (light)"],
-      ["brand-gold-500", "Gold"],
-      ["brand-gold-600", "Gold hover"],
-      ["brand-gold-active", "Gold pressed"],
-      ["brand-gold-700", "Gold (dark)"],
-      ["brand-cyan-500", "Cyan"],
-      ["brand-teal-600", "Teal"],
-      ["brand-purple-600", "Purple"],
+      ["role-cta", "Impact / CTA", "Main buttons and key actions"],
+      ["role-cta-hover", "CTA hover", "CTA while hovered"],
+      ["role-cta-pressed", "CTA pressed", "CTA while pressed"],
+      ["role-link", "Link", "Text links and inline actions"],
     ],
   },
   {
-    title: "Surfaces & text",
+    title: "Brand",
     tokens: [
-      ["surface-page", "Page background"],
-      ["surface-card", "Card"],
-      ["surface-subtle", "Subtle surface"],
-      ["surface-inverse", "Inverse surface"],
-      ["text-primary", "Text"],
-      ["text-secondary", "Text secondary"],
-      ["text-muted", "Text muted"],
-      ["text-inverse-soft", "Text on dark"],
-      ["text-inverse-muted", "Text on dark (muted)"],
-      ["border-subtle", "Border"],
-      ["border-control", "Input border"],
+      ["role-primary", "Primary", "Header, footer, dark sections"],
+      ["role-primary-soft", "Primary soft", "Middle of dark gradients"],
+      ["role-accent", "Accent", "Gradient end, icons, focus"],
+      ["role-highlight", "Highlighter", "Eyebrows and accents on dark"],
+      ["role-highlight-strong", "Highlighter (on light)", "Eyebrows on light backgrounds"],
+    ],
+  },
+  {
+    title: "Backgrounds",
+    tokens: [
+      ["role-background", "Background", "Page background"],
+      ["role-background-accent", "Background accent", "Alternate sections and panels"],
+      ["role-surface", "Surface", "Cards and forms"],
+      ["role-border", "Border", "Card and divider lines"],
+      ["role-input-border", "Input border", "Form field outlines"],
+    ],
+  },
+  {
+    title: "Text",
+    tokens: [
+      ["role-text", "Text", "Headings and body on light"],
+      ["role-text-muted", "Text muted", "Supporting copy"],
+      ["role-text-subtle", "Text subtle", "Hints and captions"],
+      ["role-text-on-dark", "Text on dark", "Body copy on dark sections"],
+      ["role-text-on-dark-muted", "Text on dark (muted)", "Supporting copy on dark"],
     ],
   },
 ] as const;
@@ -56,6 +61,18 @@ const allTokens = groups.flatMap((group) => group.tokens.map(([token]) => token)
 
 function cssVar(token: Token) {
   return `--color-${token}`;
+}
+
+function paletteCss(palette: ColorMap) {
+  const body = groups
+    .map((group) => {
+      const lines = group.tokens.map(
+        ([token, label]) => `  ${cssVar(token)}: ${palette[token]}; /* ${label} */`,
+      );
+      return [`  /* ${group.title} */`, ...lines].join("\n");
+    })
+    .join("\n\n");
+  return `@theme static {\n${body}\n}\n`;
 }
 
 function applyPalette(palette: ColorMap) {
@@ -138,11 +155,10 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
     setOverrides({});
   }
 
-  async function copyCss() {
-    const lines = allTokens
-      .filter((token) => overrides[token])
-      .map((token) => `  ${cssVar(token)}: ${overrides[token]};`);
-    await navigator.clipboard.writeText(lines.join("\n"));
+  async function copyPalette() {
+    await navigator.clipboard.writeText(
+      paletteCss({ ...defaults, ...overrides }),
+    );
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   }
@@ -201,7 +217,7 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
                       {group.title}
                     </h3>
                     <ul className="grid gap-2">
-                      {group.tokens.map(([token, label]) => {
+                      {group.tokens.map(([token, label, usage]) => {
                         const value = overrides[token] ?? defaults[token] ?? "";
                         const draft = drafts[token] ?? value;
                         const changed = Boolean(overrides[token]);
@@ -220,8 +236,8 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
                               <p className="truncate text-sm font-medium">
                                 {label}
                               </p>
-                              <p className="truncate font-mono text-[0.7rem] text-text-muted">
-                                {token}
+                              <p className="truncate text-[0.7rem] text-text-muted">
+                                {usage}
                               </p>
                             </div>
                             <input
@@ -272,13 +288,13 @@ export function BrandColorLabTrigger({ className }: { className?: string }) {
                 >
                   Reset all
                 </Button>
-                <Button
-                  type="button"
-                  className="flex-1"
-                  disabled={changedCount === 0}
-                  onClick={copyCss}
-                >
-                  {copied ? "Copied" : `Copy CSS (${changedCount})`}
+                <Button type="button" className="flex-1" onClick={copyPalette}>
+                  {copied ? (
+                    <Check aria-hidden />
+                  ) : (
+                    <Copy aria-hidden />
+                  )}
+                  {copied ? "Copied" : "Copy colors"}
                 </Button>
               </div>
             </div>,

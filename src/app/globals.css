@@ -52,31 +52,53 @@
 
 /* Not `inline`: utilities must read these variables so the brand color lab can override them at runtime. */
 @theme static {
-  --color-brand-navy-950: #03253d;
-  --color-brand-navy-900: #053754;
-  --color-brand-blue-700: #07557d;
-  --color-brand-blue-600: #0b6f8e;
-  --color-brand-gold-200: #eece8a;
-  --color-brand-gold-500: #d4a72c;
-  --color-brand-gold-600: #c79449;
-  --color-brand-gold-700: #8a5a00;
-  --color-brand-gold-active: #b6802e;
+  /* Color roles: the palette source of truth. Change brand colors here. */
+  --color-role-cta: #d4a72c;
+  --color-role-cta-hover: #c79449;
+  --color-role-cta-pressed: #b6802e;
+  --color-role-primary: #03253d;
+  --color-role-primary-soft: #053754;
+  --color-role-accent: #07557d;
+  --color-role-link: #0b6f8e;
+  --color-role-highlight: #eece8a;
+  --color-role-highlight-strong: #8a5a00;
+  --color-role-background: #f5f9f9;
+  --color-role-background-accent: #eaf2f5;
+  --color-role-surface: #ffffff;
+  --color-role-text: #03253d;
+  --color-role-text-muted: #485158;
+  --color-role-text-subtle: #5b6973;
+  --color-role-text-on-dark: #f5f9f9;
+  --color-role-text-on-dark-muted: #d6e4ea;
+  --color-role-border: #d6e4ea;
+  --color-role-input-border: #667681;
+
+  /* Scale names used by components; each one follows a role above. */
+  --color-brand-navy-950: var(--color-role-primary);
+  --color-brand-navy-900: var(--color-role-primary-soft);
+  --color-brand-blue-700: var(--color-role-accent);
+  --color-brand-blue-600: var(--color-role-link);
+  --color-brand-link: var(--color-role-link);
+  --color-brand-gold-200: var(--color-role-highlight);
+  --color-brand-gold-500: var(--color-role-cta);
+  --color-brand-gold-600: var(--color-role-cta-hover);
+  --color-brand-gold-active: var(--color-role-cta-pressed);
+  --color-brand-gold-700: var(--color-role-highlight-strong);
   --color-brand-cyan-500: #1990b8;
   --color-brand-teal-600: #0b7c83;
-  --color-brand-link: #0b6f8e;
   --color-brand-purple-600: #5b3f86;
-  --color-surface-page: #f5f9f9;
-  --color-surface-card: #ffffff;
-  --color-surface-subtle: #eaf2f5;
-  --color-surface-inverse: #03253d;
-  --color-text-primary: #03253d;
-  --color-text-secondary: #485158;
-  --color-text-muted: #5b6973;
+  --color-surface-page: var(--color-role-background);
+  --color-surface-card: var(--color-role-surface);
+  --color-surface-subtle: var(--color-role-background-accent);
+  --color-surface-inverse: var(--color-role-primary);
+  --color-text-primary: var(--color-role-text);
+  --color-text-secondary: var(--color-role-text-muted);
+  --color-text-muted: var(--color-role-text-subtle);
   --color-text-inverse: #ffffff;
-  --color-text-inverse-soft: #f5f9f9;
-  --color-text-inverse-muted: #d6e4ea;
-  --color-border-subtle: #d6e4ea;
-  --color-border-control: #667681;
+  --color-text-inverse-soft: var(--color-role-text-on-dark);
+  --color-text-inverse-muted: var(--color-role-text-on-dark-muted);
+  --color-border-subtle: var(--color-role-border);
+  --color-border-control: var(--color-role-input-border);
   --color-success: #146b4a;
   --color-warning: #8a5a00;
   --color-error: #b42318;
@@ -172,8 +194,8 @@
 .bg-hero {
   background-image: linear-gradient(
     135deg,
-    var(--color-brand-navy-950) 0%,
-    var(--color-brand-navy-900) 55%,
-    var(--color-brand-blue-700) 100%
+    var(--color-role-primary) 0%,
+    var(--color-role-primary-soft) 55%,
+    var(--color-role-accent) 100%
   );
 }
